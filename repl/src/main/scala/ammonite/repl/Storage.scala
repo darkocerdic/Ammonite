@@ -42,7 +42,7 @@ object Storage{
 
     def loadHistory: History = {
       val yaml = new Yaml
-      println("loadHistory")
+//      println("loadHistory")
       try{
         val list = yaml.load(new FileInputStream(dir + "/history"))
         list match {

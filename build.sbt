@@ -13,7 +13,7 @@ publishTo := Some(Resolver.file("Unused transient repository", file("target/unus
 
 val sharedSettings = Seq(
   scalaVersion := "2.11.7",
-  organization := "com.lihaoyi",
+  organization := "com.toptal",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
   testFrameworks += new TestFramework("utest.runner.Framework"),
@@ -24,26 +24,7 @@ val sharedSettings = Seq(
     "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
   ),
-  publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
-  pomExtra :=
-    <url>https://github.com/lihaoyi/Ammonite</url>
-      <licenses>
-        <license>
-          <name>MIT license</name>
-          <url>http://www.opensource.org/licenses/mit-license.php</url>
-        </license>
-      </licenses>
-      <scm>
-        <url>git://github.com/lihaoyi/Ammonite.git</url>
-        <connection>scm:git://github.com/lihaoyi/Ammonite.git</connection>
-      </scm>
-      <developers>
-        <developer>
-          <id>lihaoyi</id>
-          <name>Li Haoyi</name>
-          <url>https://github.com/lihaoyi</url>
-        </developer>
-      </developers>
+  publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))
 )
 
 lazy val pprint = project

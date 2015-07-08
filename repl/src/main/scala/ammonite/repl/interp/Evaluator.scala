@@ -1,5 +1,6 @@
 package ammonite.repl.interp
 
+import java.io.{FileOutputStream, BufferedOutputStream, ByteArrayInputStream, InputStream}
 import java.lang.reflect.InvocationTargetException
 import java.net.URL
 
@@ -10,6 +11,7 @@ import java.net.URLClassLoader
 
 import ammonite.repl.interp.Evaluator.SpecialClassloader
 
+import scala.reflect.io.File
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
 import scala.util.Try
@@ -47,6 +49,8 @@ trait Evaluator{
 }
 
 object Evaluator{
+  val storeClasspath = sys.props("java.class.path").split(sys.props("path.separator")).find(_.contains("/ammonite_classes/")).map(File(_))
+
   def apply(currentClassloader: ClassLoader,
             compile: => (Array[Byte], String => Unit) => Compiler.Output,
             startingLine: Int): Evaluator = new Evaluator{
@@ -112,6 +116,19 @@ object Evaluator{
 
     def addJar(url: URL) = evalClassloader.add(url)
 
+    def saveClassFile(name: String, bytes: Array[Byte]) = {
+      storeClasspath.foreach { folder =>
+        val fullPath = folder / (name+".class")
+        if (fullPath.exists)
+          fullPath.delete()
+        val bos = new BufferedOutputStream(fullPath.toFile.outputStream())
+        Try {
+          bos.write(bytes)
+          bos.close()
+        }
+      }
+    }
+
     def evalClass(code: String, wrapperName: String) = for{
 
       (output, compiled) <- Res.Success{
@@ -125,7 +142,10 @@ object Evaluator{
       )
 
       cls <- Res[Class[_]](Try {
-        for ((name, bytes) <- classFiles) evalClassloader.newFileDict(name) = bytes
+        for ((name, bytes) <- classFiles) {
+          evalClassloader.newFileDict(name) = bytes
+          saveClassFile(name,bytes)
+        }
         Class.forName(wrapperName , true, evalClassloader)
       }, e => "Failed to load compiled class " + e)
     } yield (cls, importData)
@@ -238,5 +258,15 @@ object Evaluator{
       loadedFromBytes.getOrElse(super.findClass(name))
     }
     def add(url: URL) = addURL(url)
+
+    override def getResourceAsStream(name: String): InputStream = {
+      if (name.endsWith(".class")) {
+        newFileDict.get(name.replaceAll("\\.class$",""))
+          .map(bytes => new ByteArrayInputStream(bytes))
+          .getOrElse(super.getResourceAsStream(name))
+      } else {
+        super.getResourceAsStream(name)
+      }
+    }
   }
 }
