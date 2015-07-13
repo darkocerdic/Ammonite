@@ -11,9 +11,11 @@ publishArtifact := false
 
 publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
 
+publishMavenStyle := true
+
 val sharedSettings = Seq(
   scalaVersion := "2.11.7",
-  organization := "com.toptal",
+  organization := "com.toptal.ammonitex",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
   testFrameworks += new TestFramework("utest.runner.Framework"),
@@ -24,7 +26,26 @@ val sharedSettings = Seq(
     "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
   ),
-  publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))
+  publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
+  pomExtra :=
+       <url>https://github.com/darkocerdic/Ammonite</url>
+         <licenses>
+           <license>
+             <name>MIT license</name>
+             <url>http://www.opensource.org/licenses/mit-license.php</url>
+           </license>
+         </licenses>
+         <scm>
+           <url>git://github.com/darkocerdic/Ammonite.git</url>
+           <connection>scm:git://github.com/darkocerdic/Ammonite.git</connection>
+         </scm>
+         <developers>
+           <developer>
+             <id>lihaoyi</id>
+             <name>Li Haoyi</name>
+             <url>https://github.com/lihaoyi</url>
+           </developer>
+         </developers>
 )
 
 lazy val pprint = project
@@ -70,8 +91,8 @@ lazy val pprint = project
           )
           implicit def T${i}TPrint[$tsBounded] = make[($ts)](cfg =>
             "(" + $tsGet + ")"
-          )
 
+          )
         """
       }
       val output = s"""
