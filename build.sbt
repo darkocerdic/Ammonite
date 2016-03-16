@@ -1,10 +1,10 @@
 
 import scalatex.ScalatexReadme
 import sbtassembly.AssemblyPlugin.defaultShellScript
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.8"
 
 crossScalaVersions := Seq(
-  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7"
+  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
 )
 
 publishArtifact := false
@@ -14,7 +14,7 @@ publishTo := Some(Resolver.file("Unused transient repository", file("target/unus
 publishMavenStyle := true
 
 val sharedSettings = Seq(
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.11.8",
   organization := "com.toptal.ammonitex",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
